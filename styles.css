@@ -262,7 +262,7 @@ html { scroll-padding-top: 76px; }
   background: var(--acc-bg); color: var(--acc-ink); flex: 0 0 auto;
 }
 .m-icon svg { width: 22px; height: 22px; }
-.card-tools { display: flex; gap: 6px; align-items: center; padding-top: 4px; }
+.card-tools { display: flex; gap: 6px; align-items: center; padding-top: 4px; margin-left: auto; }
 .mini-btn {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
@@ -617,7 +617,9 @@ body { --hl-on: 1; }
   .acc-head { gap: 8px; padding: 11px 12px; }
   .qnum { min-width: 30px; }
   .star-btn { width: 38px; height: 38px; }
-  .card-tools { width: 100%; justify-content: flex-start; }
+  .card-tools { margin-left: auto; justify-content: flex-end; }
+  .card-toggle { width: 34px; height: 34px; min-height: 34px; padding: 0; justify-content: center; }
+  .card-toggle .lbl { display: none; }
   .acc-body { padding: 2px 12px 14px; }
   .exp-body { padding: 4px 6px 10px; }
   .tblwrap table { min-width: 440px; }

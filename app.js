@@ -66,7 +66,7 @@ function qById(id) { for (var i = 0; i < ALLQ.length; i++) if (ALLQ[i].id === id
 /* ---------------- persisted state ---------------- */
 var KEY = "cyberlab-viva-v1";
 var DEFAULTS = {
-  mode: "learn", theme: null, highlight: true,
+  mode: "learn", theme: "light", highlight: true,
   bookmarks: {}, marks: {}, seen: {}, open: {},
   sel: {}, shuffled: false, fltRev: false
 };
@@ -392,8 +392,7 @@ function moduleCardHeadInner(m) {
   var icon = m.icon || "shield";
   var tools =
     '<div class="card-tools">' +
-      '<button type="button" class="mini-btn" data-expand="' + m.id + '">' + svg("expand") + "Expand all</button>" +
-      '<button type="button" class="mini-btn" data-collapse="' + m.id + '">' + svg("collapse") + "Collapse all</button>" +
+      '<button type="button" class="mini-btn card-toggle" data-toggle-all="' + m.id + '" aria-expanded="false">' + svg("expand") + '<span class="lbl">Expand all</span></button>' +
     "</div>";
   return (
     '<span class="m-icon">' + svg(icon) + "</span>" +
@@ -434,8 +433,7 @@ function buildGeneralCard() {
     '<span class="m-icon">' + svg("layers") + "</span>" +
     '<h2>General Cyber Security Viva Questions</h2>' +
     '<div class="card-tools">' +
-      '<button type="button" class="mini-btn" data-expand="gen">' + svg("expand") + "Expand all</button>" +
-      '<button type="button" class="mini-btn" data-collapse="gen">' + svg("collapse") + "Collapse all</button>" +
+      '<button type="button" class="mini-btn card-toggle" data-toggle-all="gen" aria-expanded="false">' + svg("expand") + '<span class="lbl">Expand all</span></button>' +
     "</div>";
   card.innerHTML =
     '<div class="card-head">' + titleHtml + "</div>" +
@@ -457,6 +455,7 @@ function setOpen(id, open) {
   e.classList.toggle("open", !!open);
   var b = $(".acc-main", e);
   if (b) b.setAttribute("aria-expanded", open ? "true" : "false");
+  syncCardToggle(e.closest(".card"));
   if (open) {
     var ans = $(".answer", e) || e.querySelector(".topic-answer");
     if (ans && !e.dataset.hl) { applyHighlights(ans); e.dataset.hl = "1"; }
@@ -489,7 +488,26 @@ function expandAllIn(modId, open) {
     var id = a.dataset.acc;
     setOpen(id, open);
   });
+  syncCardToggle(card);
 }
+
+/* one toggle button per card: "Expand all" <-> "Collapse all" */
+function cardAllOpen(card) {
+  var list = $$(".acc", card);
+  for (var i = 0; i < list.length; i++) if (!list[i].classList.contains("open")) return false;
+  return list.length > 0;
+}
+function syncCardToggle(card) {
+  if (!card) return;
+  var b = $("[data-toggle-all]", card);
+  if (!b) return;
+  var all = cardAllOpen(card);
+  b.setAttribute("aria-expanded", all ? "true" : "false");
+  b.title = all ? "Collapse all sections" : "Expand all sections";
+  b.setAttribute("aria-label", b.title);
+  b.innerHTML = svg(all ? "collapse" : "expand") + '<span class="lbl">' + (all ? "Collapse all" : "Expand all") + "</span>";
+}
+function syncAllCardToggles() { $$(".card").forEach(syncCardToggle); }
 
 function setMark(id, val) {
   if (state.marks[id] === val) delete state.marks[id];
@@ -684,6 +702,7 @@ function renderContent() {
   applyFilter();
   applyTheme();
   applyHighlightPref();
+  syncAllCardToggles();
 }
 
 /* restore open list also needs highlight/reveal pass */
@@ -866,11 +885,11 @@ function closeDrawer() {
 }
 
 /* ---------------- theme ---------------- */
-function systemDark() { try { return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { return false; } }
+/* Light is the default; dark only when the user explicitly picks it. */
 function applyTheme() {
-  var t = state.theme || (systemDark() ? "dark" : "light");
+  var t = state.theme === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = t;
-  var b = $("#themeToggle"); if (b) { b.innerHTML = svg(t === "dark" ? "sun" : "moon"); b.title = "Toggle dark mode"; }
+  var b = $("#themeToggle"); if (b) { b.innerHTML = svg(t === "dark" ? "sun" : "moon"); b.title = t === "dark" ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", b.title); }
 }
 function applyHighlightPref() {
   document.body.classList.toggle("hl-off", !state.highlight);
@@ -1012,6 +1031,8 @@ function wire() {
   $("#brandIcon").innerHTML = svg("shield");
   $("#searchIcon").innerHTML = svg("search");
   $("#menuBtn").innerHTML = svg("menu");
+  $("#bmViewBtn").innerHTML = svg("star");
+  $("#resetBtn").innerHTML = svg("rotate");
   $("#toTop").innerHTML = svg("arrowUp");
   $("#modeLearn").innerHTML = svg("book") + "Learn";
   $("#modeTest").innerHTML = svg("flask") + "Test";
@@ -1132,8 +1153,11 @@ function wire() {
       }
       return;
     }
-    if ((t = ev.target.closest("[data-expand]"))) { expandAllIn(t.dataset.expand, true); return; }
-    if ((t = ev.target.closest("[data-collapse]"))) { expandAllIn(t.dataset.collapse, false); return; }
+    if ((t = ev.target.closest("[data-toggle-all]"))) {
+      var card = t.closest(".card");
+      if (card) expandAllIn(card.id.replace(/^card-/, ""), !cardAllOpen(card));
+      return;
+    }
   });
 
   /* delegated: test panel switches */
