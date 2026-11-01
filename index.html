@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Cybersecurity Lab Viva — offline study and test app">
+<title>Cybersecurity Lab Viva — Study &amp; Test</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232fa98c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3 8 3z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="readbar"><div class="readbar-fill" id="readbar"></div></div>
+
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"></button>
+  <div class="brand">
+    <span class="brand-icon" id="brandIcon"></span>
+    <span class="brand-name">Cyber Security Lab Viva</span>
+  </div>
+  <div class="mode-toggle" role="tablist" aria-label="Study mode">
+    <button role="tab" id="modeLearn" class="mode-tab" aria-selected="true" title="Learn mode: everything readable"></button>
+    <button role="tab" id="modeTest" class="mode-tab" aria-selected="false" title="Test mode: answers hidden"></button>
+    <span class="mode-slider" aria-hidden="true"></span>
+  </div>
+  <div class="searchbox">
+    <span class="search-icon" id="searchIcon"></span>
+    <label class="sr-only" for="searchInput">Search questions, topics and answers</label>
+    <input id="searchInput" type="search" placeholder="Search questions, topics, answers…" autocomplete="off" spellcheck="false">
+    <div id="searchResults" class="search-results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="top-actions">
+    <button id="hlToggle" class="icon-btn" aria-pressed="true" title="Toggle term highlighting"></button>
+    <button id="bmViewBtn" class="icon-btn" aria-pressed="false" title="Bookmarks"></button>
+    <button id="themeToggle" class="icon-btn" title="Toggle dark mode"></button>
+    <button id="resetBtn" class="icon-btn danger" title="Reset all progress"></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav id="sidebar" class="sidebar" aria-label="Modules navigation">
+    <div class="side-head">Modules</div>
+    <div id="sideList" class="side-list"></div>
+    <div class="side-foot" id="sideStats"></div>
+  </nav>
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <main id="main" class="main" tabindex="-1">
+    <section id="testPanel" class="test-panel" hidden aria-label="Test mode controls and overall score"></section>
+    <div id="content" class="content"></div>
+    <section id="bookmarksView" hidden aria-label="Bookmarks"></section>
+    <footer class="foot">
+      <p id="footNote"></p>
+    </footer>
+  </main>
+</div>
+
+<button id="toTop" class="to-top" aria-label="Back to top" hidden></button>
+
+<div class="quiz-backdrop" id="quizBackdrop" hidden></div>
+<div class="quiz" id="quiz" role="dialog" aria-modal="true" aria-labelledby="quizTitle" hidden></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
