@@ -68,7 +68,7 @@ var KEY = "cyberlab-viva-v1";
 var DEFAULTS = {
   mode: "learn", theme: "light", highlight: true,
   bookmarks: {}, marks: {}, seen: {}, open: {},
-  sel: {}, shuffled: false, fltRev: false
+  shuffled: false, fltRev: false
 };
 var state = DEFAULTS;
 var storageOK = true;
@@ -77,9 +77,6 @@ function load() {
     var raw = localStorage.getItem(KEY);
     if (raw) { var p = JSON.parse(raw); state = Object.assign({}, DEFAULTS, p); }
   } catch (e) { storageOK = false; state = JSON.parse(JSON.stringify(DEFAULTS)); }
-  // init module selection
-  MODS.forEach(function (m) { if (!(m.id in state.sel)) state.sel[m.id] = true; });
-  if (!("gen" in state.sel)) state.sel.gen = true;
 }
 var saveTimer = null;
 function save() {
@@ -603,29 +600,25 @@ function renderSidebar() {
   var list = $("#sideList");
   if (!list) return;
   list.innerHTML = "";
-  var buildGroup = function (id, title, accent, count, hasSub, quizSel) {
+  var buildGroup = function (id, title, accent, count, hasSub) {
     var grp = el("div", "side-group");
     grp.dataset.group = id;
     grp.dataset.ac = accent;
     var row = el("div", "side-row");
-    var chk = el("input", "side-check");
-    chk.type = "checkbox";
-    chk.checked = !!quizSel;
-    chk.dataset.sel = id;
-    chk.title = "Include in Quick quiz";
-    chk.setAttribute("aria-label", "Include " + title + " in Quick quiz");
     var link = el("button", "side-link");
     link.type = "button";
     link.dataset.goto = id;
     link.innerHTML = '<span class="dot" style="background:' + (ACCENT_VAR[accent] || "#8fa3bd") + '"></span><span class="txt">' + esc(title) + "</span>";
     var box = el("span", "side-box");
     box.innerHTML = '<span class="side-count">' + count + "</span>";
-    row.appendChild(chk); row.appendChild(link);
+    row.appendChild(link);
     if (hasSub) {
       var caret = el("button", "side-caret");
       caret.type = "button";
       caret.dataset.caret = id;
+      caret.setAttribute("aria-expanded", "false");
       caret.setAttribute("aria-label", "Toggle " + title + " subsections");
+      caret.title = "Show / hide experiments";
       caret.innerHTML = svg("chevronR");
       box.appendChild(caret);
     }
@@ -633,25 +626,24 @@ function renderSidebar() {
     grp.appendChild(row);
     if (hasSub) {
       var sub = el("div", "side-sub");
+      grp.appendChild(sub);
       return { grp: grp, sub: sub };
     }
     list.appendChild(grp);
     return { grp: grp, sub: null };
   };
   MODS.forEach(function (m) {
-    var dot = buildGroup(m.id, m.title.replace(/^Module \d+: /, "M" + m.title.match(/^Module (\d+)/)[1] + ": "), m.accent, m.experiments.length + " exp", true, state.sel[m.id]);
+    var dot = buildGroup(m.id, m.title.replace(/^Module \d+: /, "M" + m.title.match(/^Module (\d+)/)[1] + ": "), m.accent, m.experiments.length + " exp", true);
     list.appendChild(dot.grp);
-    var sub = dot.sub;
     m.experiments.forEach(function (e) {
       var b = el("button", "");
       b.type = "button";
       b.dataset.goto = e.id;
       b.textContent = e.title.replace(/^Experiment \d+: /, "");
-      sub.appendChild(b);
+      dot.sub.appendChild(b);
     });
-    list.appendChild(sub);
   });
-  var g = buildGroup("gen", "General Viva Questions", "sand", GENERAL.length + " q", false, state.sel.gen);
+  var g = buildGroup("gen", "General Viva Questions", "sand", GENERAL.length + " q", false);
   list.appendChild(g.grp);
 }
 
@@ -908,8 +900,8 @@ function applyHighlightPref() {
 /* ---------------- quick quiz ---------------- */
 var quiz = { seq: [], idx: 0, revealed: {} };
 function selectedModules() {
-  var ids = MODS.map(function (m) { return m.id; }).filter(function (id) { return state.sel[id]; });
-  if (state.sel.gen) ids.push("gen");
+  var ids = MODS.map(function (m) { return m.id; });
+  ids.push("gen");
   return ids;
 }
 function buildQuizPool() {
@@ -1106,16 +1098,10 @@ function wire() {
     }
     if ((t = ev.target.closest("[data-caret]"))) {
       var g = $('[data-group="' + t.dataset.caret + '"]');
-      if (g) g.classList.toggle("open");
+      if (g) t.setAttribute("aria-expanded", g.classList.toggle("open") ? "true" : "false");
       return;
     }
     if ((t = ev.target.closest(".sr-item"))) { if (res) res.hidden = true; return; }
-  });
-
-  /* delegated: sidebar list */
-  $("#sideList").addEventListener("change", function (ev) {
-    var t = ev.target;
-    if (t.matches(".side-check")) { state.sel[t.dataset.sel] = t.checked; save(); }
   });
 
   /* delegated: content area */

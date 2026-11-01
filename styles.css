@@ -204,7 +204,7 @@ a { color: #21669c; }
 .side-caret:hover { background: #e9eef4; }
 .side-caret svg { width: 14px; height: 14px; transition: transform .2s ease; }
 .side-group.open .side-caret svg { transform: rotate(90deg); }
-.side-sub { display: none; padding: 2px 0 6px 14px; }
+.side-sub { display: none; padding: 2px 0 6px 24px; }
 .side-group.open .side-sub { display: block; }
 .side-sub button {
   display: block; width: 100%; text-align: left; cursor: pointer;
@@ -219,10 +219,6 @@ a { color: #21669c; }
 .side-count {
   font-size: 10.5px; font-weight: 700; color: var(--muted);
   background: #e9eef4; border-radius: 999px; padding: 0 7px; line-height: 18px;
-}
-.side-check {
-  width: 17px; height: 17px; accent-color: #2fa98c; cursor: pointer; flex: 0 0 auto;
-  margin-right: 6px;
 }
 .side-foot {
   margin-top: 14px; padding: 10px 12px; border: 1px dashed var(--line);
@@ -679,7 +675,6 @@ html[data-theme="dark"] mark.hl-search { background: #274b6f; color: #dcecf9; }
 
 html[data-theme="dark"] .quiz-btn { color: #3a2a05; }
 html[data-theme="dark"] .side-count { background: #243043; }
-html[data-theme="dark"] .side-check { accent-color: #59c8ab; }
 html[data-theme="dark"] .star-btn { color: #4d5c72; }
 html[data-theme="dark"] .star-btn[aria-pressed="true"], html[data-theme="dark"] .star-btn:hover { color: #ecc65f; }
 html[data-theme="dark"] .pbar { background: #232d40; }
